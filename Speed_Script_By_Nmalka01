@@ -9,12 +9,17 @@ gui.ResetOnSpawn = false
 
 local frame = Instance.new("Frame")
 frame.Parent = gui
-frame.Size = UDim2.new(0, 300, 0, 160)  -- Mid-sized
-frame.Position = UDim2.new(0.5, -150, 0.4, -80)
+frame.Size = UDim2.new(0, 300, 0, 190)  -- Mid-sized UI
+frame.Position = UDim2.new(0.5, -150, 0.4, -95)
 frame.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
 frame.BorderSizePixel = 2
 frame.Draggable = true  -- Make GUI draggable
 frame.Active = true  -- Required for drag
+frame.Visible = false  -- Initially hidden
+
+local frameCorner = Instance.new("UICorner")
+frameCorner.Parent = frame
+frameCorner.CornerRadius = UDim.new(0, 10)  -- Smooth UI
 
 local title = Instance.new("TextLabel")
 title.Parent = frame
@@ -26,6 +31,10 @@ title.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
 title.Font = Enum.Font.SourceSansBold
 title.TextSize = 20
 
+local titleCorner = Instance.new("UICorner")
+titleCorner.Parent = title
+titleCorner.CornerRadius = UDim.new(0, 8)
+
 local closeButton = Instance.new("TextButton")  -- Close ("X") Button
 closeButton.Parent = frame
 closeButton.Size = UDim2.new(0, 25, 0, 25)
@@ -36,6 +45,10 @@ closeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 closeButton.Font = Enum.Font.SourceSansBold
 closeButton.TextSize = 18
 
+local closeCorner = Instance.new("UICorner")
+closeCorner.Parent = closeButton
+closeCorner.CornerRadius = UDim.new(0, 8)
+
 local speedBox = Instance.new("TextBox")
 speedBox.Parent = frame
 speedBox.Size = UDim2.new(1, -20, 0, 40)
@@ -44,6 +57,10 @@ speedBox.Text = "Enter Speed"
 speedBox.TextSize = 18
 speedBox.ClearTextOnFocus = true
 speedBox.BackgroundColor3 = Color3.fromRGB(200, 200, 200)
+
+local speedBoxCorner = Instance.new("UICorner")
+speedBoxCorner.Parent = speedBox
+speedBoxCorner.CornerRadius = UDim.new(0, 10)
 
 local setSpeedButton = Instance.new("TextButton")
 setSpeedButton.Parent = frame
@@ -54,14 +71,32 @@ setSpeedButton.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
 setSpeedButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 setSpeedButton.TextSize = 18
 
+local setSpeedCorner = Instance.new("UICorner")
+setSpeedCorner.Parent = setSpeedButton
+setSpeedCorner.CornerRadius = UDim.new(0, 10)
+
+local creditLabel = Instance.new("TextLabel")
+creditLabel.Parent = frame
+creditLabel.Size = UDim2.new(1, 0, 0, 20)
+creditLabel.Position = UDim2.new(0, 0, 1, -25)
+creditLabel.Text = "Script made by nmalka01"
+creditLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+creditLabel.BackgroundTransparency = 1
+creditLabel.Font = Enum.Font.SourceSans
+creditLabel.TextSize = 14
+
 local toggleButton = Instance.new("TextButton")
 toggleButton.Parent = gui
-toggleButton.Size = UDim2.new(0, 120, 0, 40)
+toggleButton.Size = UDim2.new(0, 50, 0, 50)  -- Small toggle button
 toggleButton.Position = UDim2.new(0, 10, 0, 10)
-toggleButton.Text = "Speed GUI"
+toggleButton.Text = "⚡"
 toggleButton.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
 toggleButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-toggleButton.TextSize = 18
+toggleButton.TextSize = 24
+
+local toggleCorner = Instance.new("UICorner")
+toggleCorner.Parent = toggleButton
+toggleCorner.CornerRadius = UDim.new(0, 25)  -- Fully rounded button
 
 -- Function to change player speed
 setSpeedButton.MouseButton1Click:Connect(function()
