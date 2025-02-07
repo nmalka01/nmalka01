@@ -1,53 +1,45 @@
 local player = game.Players.LocalPlayer
 local character = player.Character or player.CharacterAdded:Wait()
-local humanoid = character:FindFirstChildOfClass("Humanoid")
+local humanoid = character:WaitForChild("Humanoid")
 
 -- Create ScreenGui
 local adminGui = Instance.new("ScreenGui")
 adminGui.Name = "AdminPanel"
-adminGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+adminGui.Parent = player:WaitForChild("PlayerGui")
 adminGui.ResetOnSpawn = false
 
--- Create Main Frame
+-- Main Frame (Auto Size)
 local mainFrame = Instance.new("Frame")
-mainFrame.Size = UDim2.new(0.3, 0, 0.4, 0)
-mainFrame.Position = UDim2.new(0.35, 0, 0.3, 0)
-mainFrame.BackgroundColor3 = Color3.fromRGB(50, 50, 50) -- Light gray
-mainFrame.BackgroundTransparency = 0.5 -- Transparent look
+mainFrame.Size = UDim2.new(0.35, 0, 0.45, 0) -- Scales with screen
+mainFrame.Position = UDim2.new(0.325, 0, 0.275, 0)
+mainFrame.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+mainFrame.BackgroundTransparency = 0.4 -- Semi-transparent
 mainFrame.BorderSizePixel = 0
 mainFrame.Draggable = true
 mainFrame.Active = true
 mainFrame.Visible = false
 mainFrame.Parent = adminGui
 
--- Add UICorner for rounded edges
+-- UICorner for smooth design
 local corner = Instance.new("UICorner")
-corner.CornerRadius = UDim.new(0.1, 0) -- Smooth rounded edges
+corner.CornerRadius = UDim.new(0.1, 0)
 corner.Parent = mainFrame
 
--- Add UIStroke for a classy outline
+-- UIStroke for outline
 local stroke = Instance.new("UIStroke")
 stroke.Thickness = 1
-stroke.Color = Color3.fromRGB(180, 180, 180) -- Light gray stroke
+stroke.Color = Color3.fromRGB(180, 180, 180)
 stroke.Parent = mainFrame
 
--- Create Toggle Button
-local toggleButton = Instance.new("TextButton")
-toggleButton.Size = UDim2.new(0.1, 0, 0.05, 0)
-toggleButton.Position = UDim2.new(0.9, 0, 0.05, 0)
-toggleButton.Text = "Admin"
-toggleButton.TextScaled = true
-toggleButton.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-toggleButton.Parent = adminGui
+-- UIListLayout for auto button arrangement
+local layout = Instance.new("UIListLayout")
+layout.Parent = mainFrame
+layout.FillDirection = Enum.FillDirection.Vertical
+layout.Padding = UDim.new(0.02, 0)
 
-toggleButton.MouseButton1Click:Connect(function()
-    mainFrame.Visible = not mainFrame.Visible
-end)
-
--- Create Title Label
+-- Admin Title
 local titleLabel = Instance.new("TextLabel")
-titleLabel.Size = UDim2.new(0.8, 0, 0.1, 0)
-titleLabel.Position = UDim2.new(0.1, 0, 0, 0)
+titleLabel.Size = UDim2.new(1, 0, 0.1, 0)
 titleLabel.Text = "Admin panel by nmalka01"
 titleLabel.TextScaled = true
 titleLabel.BackgroundTransparency = 1
@@ -55,36 +47,34 @@ titleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
 titleLabel.Font = Enum.Font.GothamBold
 titleLabel.Parent = mainFrame
 
--- Create Buttons
-local function createButton(text, position, callback)
+-- Create Button Function (Auto-Scales)
+local function createButton(text, callback)
     local button = Instance.new("TextButton")
-    button.Size = UDim2.new(0.8, 0, 0.1, 0)
-    button.Position = UDim2.new(0.1, 0, position, 0)
+    button.Size = UDim2.new(0.9, 0, 0.12, 0) -- Auto-size for devices
     button.Text = text
     button.TextScaled = true
     button.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
     button.TextColor3 = Color3.fromRGB(255, 255, 255)
     button.Parent = mainFrame
     button.MouseButton1Click:Connect(callback)
-    
-    -- Add UICorner & UIStroke for buttons
+
+    -- Button UICorner
     local buttonCorner = Instance.new("UICorner")
     buttonCorner.CornerRadius = UDim.new(0.1, 0)
     buttonCorner.Parent = button
 
+    -- Button UIStroke
     local buttonStroke = Instance.new("UIStroke")
     buttonStroke.Thickness = 1
     buttonStroke.Color = Color3.fromRGB(180, 180, 180)
     buttonStroke.Parent = button
-
-    return button
 end
 
--- Fly Function
+-- Fly Toggle
 local flying = false
 function fly()
-    local character = player.Character
-    if not character then return end
+    local root = character:FindFirstChild("HumanoidRootPart")
+    if not root then return end
     flying = not flying
 
     if flying then
@@ -92,41 +82,41 @@ function fly()
         bodyVelocity.Velocity = Vector3.new(0, 50, 0)
         bodyVelocity.MaxForce = Vector3.new(4000, 4000, 4000)
         bodyVelocity.Name = "FlyVelocity"
-        bodyVelocity.Parent = character:FindFirstChild("HumanoidRootPart")
+        bodyVelocity.Parent = root
     else
-        if character:FindFirstChild("HumanoidRootPart") then
-            local bv = character.HumanoidRootPart:FindFirstChild("FlyVelocity")
-            if bv then bv:Destroy() end
-        end
+        local bv = root:FindFirstChild("FlyVelocity")
+        if bv then bv:Destroy() end
     end
 end
+createButton("Toggle Fly", fly)
 
-createButton("Fly", 0.15, fly)
+-- Speed Controls
+createButton("Speed Boost (100)", function() humanoid.WalkSpeed = 100 end)
+createButton("Reset Speed (16)", function() humanoid.WalkSpeed = 16 end)
 
--- Speed Changer
-createButton("Speed Boost", 0.3, function()
-    humanoid.WalkSpeed = 100
+-- Jump Controls
+createButton("Jump Power (150)", function() humanoid.JumpPower = 150 end)
+createButton("Reset Jump Power (50)", function() humanoid.JumpPower = 50 end)
+
+-- Kill Player
+createButton("Kill", function() humanoid.Health = 0 end)
+
+-- Lag Server (⚠️ DANGER)
+createButton("Lag Server (⚠️)", function() while true do end end)
+
+-- Toggle Button
+local toggleButton = Instance.new("TextButton")
+toggleButton.Size = UDim2.new(0.12, 0, 0.06, 0) -- Auto-size
+toggleButton.Position = UDim2.new(0.85, 0, 0.05, 0) -- Top-right
+toggleButton.Text = "Admin"
+toggleButton.TextScaled = true
+toggleButton.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+toggleButton.Parent = adminGui
+toggleButton.MouseButton1Click:Connect(function()
+    mainFrame.Visible = not mainFrame.Visible
 end)
 
-createButton("Reset Speed", 0.4, function()
-    humanoid.WalkSpeed = 16
-end)
-
--- Jump Power Changer
-createButton("Jump Power Boost", 0.5, function()
-    humanoid.JumpPower = 150
-end)
-
-createButton("Reset Jump Power", 0.6, function()
-    humanoid.JumpPower = 50
-end)
-
--- Kill Button
-createButton("Kill", 0.7, function()
-    humanoid.Health = 0
-end)
-
--- Lag Server
-createButton("Lag Server", 0.8, function()
-    while true do end -- Infinite loop (⚠️ Crashes server!)
-end)
+-- Toggle Button UICorner
+local toggleCorner = Instance.new("UICorner")
+toggleCorner.CornerRadius = UDim.new(0.1, 0)
+toggleCorner.Parent = toggleButton
