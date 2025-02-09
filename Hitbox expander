@@ -1,0 +1,131 @@
+local player = game.Players.LocalPlayer
+local screenGui = Instance.new("ScreenGui")
+screenGui.Parent = game.CoreGui
+
+-- Create Open Button
+local openButton = Instance.new("TextButton")
+openButton.Size = UDim2.new(0, 50, 0, 50)
+openButton.Position = UDim2.new(0, 10, 0, 10)
+openButton.BackgroundTransparency = 0.5
+openButton.Text = "⚙️"
+openButton.Parent = screenGui
+
+-- Apply UI Styling
+local function applyUIStyling(gui)
+    local uiCorner = Instance.new("UICorner")
+    uiCorner.CornerRadius = UDim.new(0, 8)
+    uiCorner.Parent = gui
+    
+    local uiStroke = Instance.new("UIStroke")
+    uiStroke.Thickness = 1
+    uiStroke.Color = Color3.fromRGB(150, 150, 150)
+    uiStroke.Parent = gui
+end
+
+applyUIStyling(openButton)
+
+-- Create Main GUI
+local mainGui = Instance.new("Frame")
+mainGui.Size = UDim2.new(0, 200, 0, 120)
+mainGui.Position = UDim2.new(0.5, -100, 0.5, -60)
+mainGui.BackgroundTransparency = 0.5
+mainGui.Visible = false
+mainGui.Parent = screenGui
+
+applyUIStyling(mainGui)
+
+-- Draggability
+local dragging, dragInput, dragStart, startPos
+
+local function update(input)
+    local delta = input.Position - dragStart
+    mainGui.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+end
+
+mainGui.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragging = true
+        dragStart = input.Position
+        startPos = mainGui.Position
+
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                dragging = false
+            end
+        end)
+    end
+end)
+
+mainGui.InputChanged:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseMovement then
+        dragInput = input
+    end
+end)
+
+game:GetService("UserInputService").InputChanged:Connect(function(input)
+    if input == dragInput and dragging then
+        update(input)
+    end
+end)
+
+-- Create Label
+local titleLabel = Instance.new("TextLabel")
+titleLabel.Size = UDim2.new(1, 0, 0, 30)
+titleLabel.Text = "Hitbox made by nmalka01"
+titleLabel.BackgroundTransparency = 1
+titleLabel.TextScaled = true
+titleLabel.TextColor3 = Color3.new(1, 1, 1)
+titleLabel.Parent = mainGui
+
+-- Create Expand Hitbox Button
+local expandButton = Instance.new("TextButton")
+expandButton.Size = UDim2.new(0.8, 0, 0, 40)
+expandButton.Position = UDim2.new(0.1, 0, 0.5, -20)
+expandButton.Text = "Expand Hitbox"
+expandButton.BackgroundTransparency = 0.5
+expandButton.Parent = mainGui
+
+applyUIStyling(expandButton)
+
+-- Function to Expand Hitboxes for Other Players
+local function expandHitboxForOthers()
+    for _, otherPlayer in pairs(game.Players:GetPlayers()) do
+        if otherPlayer ~= player then -- Ignore the activator
+            local character = otherPlayer.Character
+            if character then
+                local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
+                if humanoidRootPart and not humanoidRootPart:FindFirstChild("Hitbox") then
+                    local hitbox = Instance.new("Part")
+                    hitbox.Name = "Hitbox"
+                    hitbox.Size = humanoidRootPart.Size + Vector3.new(30, 30, 30) -- Adjusted hitbox size
+                    hitbox.Transparency = 0.5
+                    hitbox.CanCollide = false
+                    hitbox.Anchored = false
+                    hitbox.CastShadow = false -- Disable shadow casting
+                    hitbox.Parent = character
+
+                    -- Position the hitbox at the center of the player's root part
+                    hitbox.Position = humanoidRootPart.Position
+
+                    local weld = Instance.new("WeldConstraint")
+                    weld.Part0 = humanoidRootPart
+                    weld.Part1 = hitbox
+                    weld.Parent = hitbox
+
+                    local highlight = Instance.new("Highlight")
+                    highlight.FillColor = Color3.new(1, 0, 0)
+                    highlight.FillTransparency = 0.5
+                    highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop -- Visible through walls
+                    highlight.Parent = hitbox
+                end
+            end
+        end
+    end
+end
+
+expandButton.MouseButton1Click:Connect(expandHitboxForOthers)
+
+-- Toggle GUI Visibility
+openButton.MouseButton1Click:Connect(function()
+    mainGui.Visible = not mainGui.Visible
+end)
