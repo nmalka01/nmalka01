@@ -1,4 +1,4 @@
-local player = game.Players.LocalPlayer
+local player = game.Players.LocalPlayer 
 local screenGui = Instance.new("ScreenGui")
 screenGui.Parent = game.CoreGui
 
@@ -10,7 +10,7 @@ openButton.BackgroundTransparency = 0.5
 openButton.Text = "⚙️"
 openButton.Parent = screenGui
 
--- Apply UI Styling function
+-- Apply UI Styling
 local function applyUIStyling(gui)
     local uiCorner = Instance.new("UICorner")
     uiCorner.CornerRadius = UDim.new(0, 8)
@@ -21,19 +21,20 @@ local function applyUIStyling(gui)
     uiStroke.Color = Color3.fromRGB(150, 150, 150)
     uiStroke.Parent = gui
 end
+
 applyUIStyling(openButton)
 
 -- Create Main GUI
 local mainGui = Instance.new("Frame")
-mainGui.Size = UDim2.new(0, 240, 0, 160)  -- Slightly bigger GUI
-mainGui.Position = UDim2.new(0.5, -120, 0.5, -80)
+mainGui.Size = UDim2.new(0, 200, 0, 120)
+mainGui.Position = UDim2.new(0.5, -100, 0.5, -60)
 mainGui.BackgroundTransparency = 0.5
 mainGui.Visible = false
 mainGui.Parent = screenGui
 
 applyUIStyling(mainGui)
 
--- Draggability setup
+-- Draggability
 local dragging, dragInput, dragStart, startPos
 local function update(input)
     local delta = input.Position - dragStart
@@ -78,46 +79,21 @@ titleLabel.Parent = mainGui
 -- Create Expand Hitbox Button
 local expandButton = Instance.new("TextButton")
 expandButton.Size = UDim2.new(0.8, 0, 0, 40)
-expandButton.Position = UDim2.new(0.1, 0, 0.2, -20)
+expandButton.Position = UDim2.new(0.1, 0, 0.5, -20)
 expandButton.Text = "Expand Hitbox"
 expandButton.BackgroundTransparency = 0.5
 expandButton.Parent = mainGui
+
 applyUIStyling(expandButton)
-
--- Create Teleport Button
-local teleportButton = Instance.new("TextButton")
-teleportButton.Size = UDim2.new(0.8, 0, 0, 40)
-teleportButton.Position = UDim2.new(0.1, 0, 0.5, -20)
-teleportButton.Text = "Teleport to Player"
-teleportButton.BackgroundTransparency = 0.5
-teleportButton.Parent = mainGui
-applyUIStyling(teleportButton)
-
--- Create Teleport TextBox for Username Input
-local usernameInput = Instance.new("TextBox")
-usernameInput.Size = UDim2.new(0.8, 0, 0, 30)
-usernameInput.Position = UDim2.new(0.1, 0, 0.8, -15)
-usernameInput.PlaceholderText = "Enter Player's Name"
-usernameInput.TextScaled = true
-usernameInput.Parent = mainGui
-applyUIStyling(usernameInput)
-
--- Create Noclip Button
-local noclipButton = Instance.new("TextButton")
-noclipButton.Size = UDim2.new(0.8, 0, 0, 40)
-noclipButton.Position = UDim2.new(0.1, 0, 0.3, -20)
-noclipButton.Text = "Noclip"
-noclipButton.BackgroundTransparency = 0.5
-noclipButton.Parent = mainGui
-applyUIStyling(noclipButton)
 
 -- Hitbox Expansion Logic
 _G.HeadSize = 20
 _G.Disabled = true
+
 game:GetService('RunService').RenderStepped:Connect(function()
     if not _G.Disabled then
         for _, v in pairs(game:GetService('Players'):GetPlayers()) do
-            if v ~= player then
+            if v ~= player then -- Ignore the player using the script
                 pcall(function()
                     local rootPart = v.Character and v.Character:FindFirstChild("HumanoidRootPart")
                     if rootPart then
@@ -138,38 +114,7 @@ expandButton.MouseButton1Click:Connect(function()
     _G.Disabled = not _G.Disabled
 end)
 
--- Teleport Player to Target Player
-teleportButton.MouseButton1Click:Connect(function()
-    local targetPlayer = game.Players:FindFirstChild(usernameInput.Text)
-    if targetPlayer then
-        player.Character:SetPrimaryPartCFrame(targetPlayer.Character.HumanoidRootPart.CFrame)
-    else
-        print("Player not found!")
-    end
-end)
-
--- Noclip Logic
-local noclipEnabled = false
-noclipButton.MouseButton1Click:Connect(function()
-    noclipEnabled = not noclipEnabled
-    while noclipEnabled do
-        player.Character.Humanoid:ChangeState(Enum.HumanoidStateType.Physics)
-        for _, part in pairs(player.Character:GetChildren()) do
-            if part:IsA("BasePart") then
-                part.CanCollide = false
-            end
-        end
-        wait(0.1)
-    end
-    for _, part in pairs(player.Character:GetChildren()) do
-        if part:IsA("BasePart") then
-            part.CanCollide = true
-        end
-    end
-end)
-
 -- Toggle GUI Visibility
 openButton.MouseButton1Click:Connect(function()
     mainGui.Visible = not mainGui.Visible
 end)
-
