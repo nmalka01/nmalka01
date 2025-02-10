@@ -1,0 +1,150 @@
+local ScreenGui = Instance.new("ScreenGui")
+local OpenButton = Instance.new("ImageButton")
+local MainFrame = Instance.new("Frame")
+local TitleLabel = Instance.new("TextLabel") -- Title
+local EnableButton1 = Instance.new("TextButton")
+local EnableButton2 = Instance.new("TextButton")
+local EnableButton3 = Instance.new("TextButton")
+local EnableButton4 = Instance.new("TextButton")
+local CreditLabel = Instance.new("TextLabel")
+local UICornerMain = Instance.new("UICorner")
+local UIStrokeMain = Instance.new("UIStroke")
+local UIS = game:GetService("UserInputService")
+
+ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+
+-- Open Button
+OpenButton.Parent = ScreenGui
+OpenButton.Size = UDim2.new(0, 45, 0, 45)
+OpenButton.Position = UDim2.new(0.05, 0, 0.5, 0)
+OpenButton.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+OpenButton.BackgroundTransparency = 0.2
+OpenButton.Image = "rbxassetid://120669661004561"
+OpenButton.ScaleType = Enum.ScaleType.Fit
+
+-- Main GUI Frame (Smaller Size)
+MainFrame.Parent = ScreenGui
+MainFrame.Size = UDim2.new(0, 250, 0, 270)
+MainFrame.Position = UDim2.new(0.5, -125, 0.5, -135)
+MainFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+MainFrame.BackgroundTransparency = 0.8
+MainFrame.Visible = false
+UICornerMain.Parent = MainFrame
+UIStrokeMain.Parent = MainFrame
+UIStrokeMain.Thickness = 2
+UIStrokeMain.Color = Color3.fromRGB(255, 255, 255)
+
+-- Title Label
+TitleLabel.Parent = MainFrame
+TitleLabel.Size = UDim2.new(1, 0, 0, 25)
+TitleLabel.Position = UDim2.new(0, 0, 0, 0)
+TitleLabel.BackgroundTransparency = 1
+TitleLabel.Text = "[Sus Movements GUI 2.0]"
+TitleLabel.TextScaled = true
+TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+
+-- Buttons (Smaller & Tighter Spacing)
+local buttonSize = UDim2.new(0, 130, 0, 30)
+
+EnableButton1.Parent = MainFrame
+EnableButton1.Size = buttonSize
+EnableButton1.Position = UDim2.new(0.5, -65, 0.15, 0)
+EnableButton1.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+EnableButton1.Text = "J*rk Off (R15)"
+EnableButton1.TextScaled = true
+EnableButton1.TextColor3 = Color3.new(1, 1, 1)
+
+EnableButton2.Parent = MainFrame
+EnableButton2.Size = buttonSize
+EnableButton2.Position = UDim2.new(0.5, -65, 0.3, 0)
+EnableButton2.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+EnableButton2.Text = "Head Bang (R6)"
+EnableButton2.TextScaled = true
+EnableButton2.TextColor3 = Color3.new(1, 1, 1)
+
+EnableButton3.Parent = MainFrame
+EnableButton3.Size = buttonSize
+EnableButton3.Position = UDim2.new(0.5, -65, 0.45, 0)
+EnableButton3.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+EnableButton3.Text = "Bang Script (R6)"
+EnableButton3.TextScaled = true
+EnableButton3.TextColor3 = Color3.new(1, 1, 1)
+
+EnableButton4.Parent = MainFrame
+EnableButton4.Size = buttonSize
+EnableButton4.Position = UDim2.new(0.5, -65, 0.6, 0)
+EnableButton4.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+EnableButton4.Text = "J*rk Off (R6)"
+EnableButton4.TextScaled = true
+EnableButton4.TextColor3 = Color3.new(1, 1, 1)
+
+-- Credit Label (Smaller)
+CreditLabel.Parent = MainFrame
+CreditLabel.Size = UDim2.new(1, 0, 0, 15)
+CreditLabel.Position = UDim2.new(0, 0, 0.9, 0)
+CreditLabel.BackgroundTransparency = 1
+CreditLabel.Text = "made by nmalka01"
+CreditLabel.TextScaled = true
+CreditLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+
+-- Open/Close GUI
+OpenButton.MouseButton1Click:Connect(function()
+    MainFrame.Visible = not MainFrame.Visible
+end)
+
+-- Scripts Execution
+EnableButton1.MouseButton1Click:Connect(function()
+    loadstring(game:HttpGet("https://pastefy.app/YZoglOyJ/raw"))()
+end)
+
+EnableButton2.MouseButton1Click:Connect(function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/AKadminlol/Facefuck/refs/heads/main/CreditsbyAK"))()
+end)
+
+EnableButton3.MouseButton1Click:Connect(function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/4gh9/Bang-Script-Gui/main/bang%20gui.lua"))()
+end)
+
+EnableButton4.MouseButton1Click:Connect(function()
+    loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-jerk-off-25958"))()
+end)
+
+-- Make GUI Draggable
+local function MakeDraggable(frame)
+    local dragging, dragInput, dragStart, startPos
+
+    local function Update(input)
+        local delta = input.Position - dragStart
+        frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+    end
+
+    frame.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            dragging = true
+            dragStart = input.Position
+            startPos = frame.Position
+
+            input.Changed:Connect(function()
+                if input.UserInputState == Enum.UserInputState.End then
+                    dragging = false
+                end
+            end)
+        end
+    end)
+
+    frame.InputChanged:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+            dragInput = input
+        end
+    end)
+
+    UIS.InputChanged:Connect(function(input)
+        if input == dragInput and dragging then
+            Update(input)
+        end
+    end)
+end
+
+-- Make both the GUI and opener draggable
+MakeDraggable(OpenButton)
+MakeDraggable(MainFrame)
