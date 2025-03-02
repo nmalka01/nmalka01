@@ -1,0 +1,170 @@
+-- Define the center position
+local center = Vector3.new(-23.51, 6.7, -95.66)
+
+-- Define the size of the area
+local size = Vector3.new(2048, 0.56, 2048)
+
+-- Define the corners of the area
+local corners = {
+    center + Vector3.new(-size.X / 2, 0, -size.Z / 2), -- Bottom-left corner
+    center + Vector3.new(size.X / 2, 0, -size.Z / 2),  -- Bottom-right corner
+    center + Vector3.new(-size.X / 2, 0, size.Z / 2),  -- Top-left corner
+    center + Vector3.new(size.X / 2, 0, size.Z / 2)    -- Top-right corner
+}
+
+-- Get the player's character
+local player = game.Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local rootPart = character:FindFirstChild("HumanoidRootPart")
+
+if not rootPart then
+    warn("HumanoidRootPart not found!")
+    return
+end
+
+-- Save the player's original position and CFrame
+local originalCFrame = rootPart.CFrame
+
+-- Create a platform part to prevent the player from falling
+local platform = Instance.new("Part")
+platform.Size = Vector3.new(size.X, 1, size.Z) -- Make the platform cover the entire area
+platform.Position = center - Vector3.new(0, 0.5, 0) -- Position it just below the player
+platform.Anchored = true
+platform.Transparency = 1 -- Make it invisible
+platform.CanCollide = true
+platform.Parent = workspace
+
+-- Function to smoothly move the player to a position
+local function moveToPosition(targetPosition, duration)
+    local startTime = tick()
+    local startCFrame = rootPart.CFrame
+    local endCFrame = CFrame.new(targetPosition)
+
+    while tick() - startTime < duration do
+        local elapsed = tick() - startTime
+        local fraction = elapsed / duration
+        rootPart.CFrame = startCFrame:Lerp(endCFrame, fraction)
+        wait()
+    end
+
+    -- Ensure the player reaches the exact target position
+    rootPart.CFrame = endCFrame
+end
+
+-- Function to teleport the player to all corners
+local function teleportPlayer()
+    local delayBetweenCorners = 1 -- Adjust this to control the speed (in seconds)
+
+    for _, corner in ipairs(corners) do
+        moveToPosition(corner, delayBetweenCorners) -- Move to the corner
+        wait(delayBetweenCorners) -- Wait before moving to the next corner
+    end
+
+    -- Return the player to their original position
+    moveToPosition(originalCFrame.Position, delayBetweenCorners)
+
+    -- Delete the platform after the teleportation is complete
+    platform:Destroy()
+
+    print("Teleportation complete! You're back where you started.")
+end
+
+-- Custom GUI
+local gui = Instance.new("ScreenGui")
+gui.Name = "CustomGUI"
+gui.Parent = player.PlayerGui
+
+-- Main frame
+local frame = Instance.new("Frame")
+frame.Size = UDim2.new(0, 200, 0, 100)
+frame.Position = UDim2.new(0.5, -100, 0.5, -50) -- Center of the screen
+frame.BackgroundColor3 = Color3.new(0.1, 0.1, 0.1)
+frame.BackgroundTransparency = 0.2 -- Semi-transparent
+frame.BorderSizePixel = 0
+frame.Active = true -- Allows dragging
+frame.Draggable = true -- Makes the frame draggable
+frame.Parent = gui
+
+-- Rounded corners
+local uiCorner = Instance.new("UICorner")
+uiCorner.CornerRadius = UDim.new(0, 8)
+uiCorner.Parent = frame
+
+-- Gradient effect (black to purple)
+local gradient = Instance.new("UIGradient")
+gradient.Rotation = 90
+gradient.Color = ColorSequence.new({
+    ColorSequenceKeypoint.new(0, Color3.new(0, 0, 0)), -- Black
+    ColorSequenceKeypoint.new(0.5, Color3.new(0.5, 0, 0.5)), -- Purple
+    ColorSequenceKeypoint.new(1, Color3.new(0, 0, 0)) -- Black
+})
+gradient.Parent = frame
+
+-- UIStroke for sleek outline
+local uiStroke = Instance.new("UIStroke")
+uiStroke.Color = Color3.new(0.5, 0, 0.5) -- Purple outline
+uiStroke.Thickness = 2
+uiStroke.Parent = frame
+
+-- Activate button
+local activateButton = Instance.new("TextButton")
+activateButton.Size = UDim2.new(0, 150, 0, 50)
+activateButton.Position = UDim2.new(0.5, -75, 0.5, -25)
+activateButton.Text = "Activate Teleport"
+activateButton.TextColor3 = Color3.new(1, 1, 1)
+activateButton.BackgroundColor3 = Color3.new(0.5, 0, 0.5) -- Purple
+activateButton.BackgroundTransparency = 0.4 -- Semi-transparent
+activateButton.BorderSizePixel = 0
+activateButton.Parent = frame
+
+-- Rounded corners for the button
+local buttonCorner = Instance.new("UICorner")
+buttonCorner.CornerRadius = UDim.new(0, 8)
+buttonCorner.Parent = activateButton
+
+-- UIStroke for the button
+local buttonStroke = Instance.new("UIStroke")
+buttonStroke.Color = Color3.new(0.3, 0, 0.3) -- Dark purple outline
+buttonStroke.Thickness = 2
+buttonStroke.Parent = activateButton
+
+activateButton.MouseButton1Click:Connect(function()
+    teleportPlayer() -- Run the teleportation script
+end)
+
+-- Hexagon button to reopen/close the GUI
+local hexagonButton = Instance.new("ImageButton")
+hexagonButton.Size = UDim2.new(0, 50, 0, 50)
+hexagonButton.Position = UDim2.new(0, 10, 1, -60) -- Bottom-left corner
+hexagonButton.BackgroundColor3 = Color3.new(0, 0, 0) -- Black
+hexagonButton.BackgroundTransparency = 0.2 -- Semi-transparent
+hexagonButton.Image = "rbxassetid://115890387031366" -- Custom image
+hexagonButton.BorderSizePixel = 0
+hexagonButton.Parent = gui
+
+-- Rounded corners for the hexagon button
+local hexagonCorner = Instance.new("UICorner")
+hexagonCorner.CornerRadius = UDim.new(0, 12)
+hexagonCorner.Parent = hexagonButton
+
+-- UIStroke for the hexagon button
+local hexagonStroke = Instance.new("UIStroke")
+hexagonStroke.Color = Color3.new(0.5, 0, 0.5) -- Purple outline
+hexagonStroke.Thickness = 2
+hexagonStroke.Parent = hexagonButton
+
+-- Toggle GUI visibility
+hexagonButton.MouseButton1Click:Connect(function()
+    frame.Visible = not frame.Visible -- Toggle visibility
+end)
+
+-- "Made by nmalka01" text label
+local madeByText = Instance.new("TextLabel")
+madeByText.Size = UDim2.new(0, 200, 0, 20)
+madeByText.Position = UDim2.new(0.5, -100, 0.5, 30) -- Centered below the frame
+madeByText.Text = "Made by nmalka01"
+madeByText.TextColor3 = Color3.new(1, 1, 1)
+madeByText.BackgroundTransparency = 1 -- Transparent background
+madeByText.TextSize = 14
+madeByText.Font = Enum.Font.SourceSans
+madeByText.Parent = gui
