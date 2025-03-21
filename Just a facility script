@@ -1,0 +1,174 @@
+local player = game.Players.LocalPlayer
+local gui = Instance.new("ScreenGui")
+gui.ResetOnSpawn = false
+gui.Parent = player:WaitForChild("PlayerGui")
+
+-- **Smaller Mobile-Friendly UI Frame**
+local frame = Instance.new("Frame")
+frame.Size = UDim2.new(0.35, 0, 0.4, 0) -- Reduced size
+frame.Position = UDim2.new(0.325, 0, 0.3, 0) -- Centered
+frame.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+frame.BorderSizePixel = 0
+frame.Active = true
+frame.Draggable = true
+frame.Parent = gui
+
+-- Rounded Corners for GUI
+local corner = Instance.new("UICorner")
+corner.CornerRadius = UDim.new(0.05, 0)
+corner.Parent = frame
+
+-- **Red-Black Gradient**
+local gradient = Instance.new("UIGradient")
+gradient.Color = ColorSequence.new{
+    ColorSequenceKeypoint.new(0, Color3.fromRGB(150, 0, 0)),  
+    ColorSequenceKeypoint.new(0.6, Color3.fromRGB(100, 0, 0)),  
+    ColorSequenceKeypoint.new(1, Color3.fromRGB(0, 0, 0))     
+}
+gradient.Rotation = -45
+gradient.Parent = frame
+
+-- **GUI Opener Button**
+local guiOpener = Instance.new("ImageButton")
+guiOpener.Size = UDim2.new(0, 50, 0, 50)
+guiOpener.Position = UDim2.new(0.05, 0, 0.8, 0) -- Bottom-left initially
+guiOpener.BackgroundTransparency = 1
+guiOpener.Image = "rbxassetid://91324891167443"
+guiOpener.Parent = gui
+guiOpener.Visible = false
+
+-- **Close Button (X)**
+local closeButton = Instance.new("TextButton")
+closeButton.Size = UDim2.new(0.12, 0, 0.12, 0)
+closeButton.Position = UDim2.new(0.88, 0, -0.05, 0)
+closeButton.BackgroundColor3 = Color3.fromRGB(255, 50, 50)
+closeButton.Text = "X"
+closeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+closeButton.Font = Enum.Font.SourceSansBold
+closeButton.TextSize = 18
+closeButton.Parent = frame
+
+local closeCorner = Instance.new("UICorner")
+closeCorner.CornerRadius = UDim.new(0.3, 0)
+closeCorner.Parent = closeButton
+
+-- **Close Button Functionality**
+closeButton.MouseButton1Click:Connect(function()
+    frame.Visible = false
+    guiOpener.Visible = true
+end)
+
+-- **Make GUI Opener Draggable**
+local draggingOpener
+local dragInputOpener
+local startPosOpener
+local dragStartOpener
+
+guiOpener.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        draggingOpener = true
+        dragStartOpener = input.Position
+        startPosOpener = guiOpener.Position
+
+        input.Changed:Connect(function()
+            if input.UserInputState == Enum.UserInputState.End then
+                draggingOpener = false
+            end
+        end)
+    end
+end)
+
+guiOpener.InputChanged:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+        dragInputOpener = input
+    end
+end)
+
+game:GetService("UserInputService").InputChanged:Connect(function(input)
+    if input == dragInputOpener and draggingOpener then
+        local delta = input.Position - dragStartOpener
+        guiOpener.Position = UDim2.new(
+            startPosOpener.X.Scale, startPosOpener.X.Offset + delta.X,
+            startPosOpener.Y.Scale, startPosOpener.Y.Offset + delta.Y
+        )
+    end
+end)
+
+-- **Open GUI When Clicking the Opener Button**
+guiOpener.MouseButton1Click:Connect(function()
+    frame.Visible = true
+    guiOpener.Visible = false
+end)
+
+-- **Function to Create Buttons**
+local function createButton(position, text, teamName)
+    local button = Instance.new("TextButton")
+    button.Size = UDim2.new(0.8, 0, 0.12, 0)
+    button.Position = UDim2.new(0.1, 0, position, 0)
+    button.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    button.BackgroundTransparency = 0.3
+    button.TextColor3 = Color3.fromRGB(255, 255, 255)
+    button.Text = text
+    button.Font = Enum.Font.SourceSansBold
+    button.TextSize = 20
+    button.TextXAlignment = Enum.TextXAlignment.Left
+    button.Parent = frame
+
+    -- **Rounded Corners for Buttons**
+    local btnCorner = Instance.new("UICorner")
+    btnCorner.CornerRadius = UDim.new(0.5, 0)
+    btnCorner.Parent = button
+
+    -- **UIStroke for Buttons Only**
+    local btnStroke = Instance.new("UIStroke")
+    btnStroke.Thickness = 1.2
+    btnStroke.Color = Color3.fromRGB(50, 50, 50)
+    btnStroke.Parent = button
+
+    -- **Small Green Indicator**
+    local indicator = Instance.new("Frame")
+    indicator.Size = UDim2.new(0.05, 0, 0.7, 0)  
+    indicator.Position = UDim2.new(0.9, 0, 0.15, 0)  
+    indicator.BackgroundColor3 = Color3.fromRGB(0, 255, 0)  
+    indicator.BackgroundTransparency = 1  
+    indicator.Parent = button
+
+    -- Rounded Corners for Indicator
+    local indicatorCorner = Instance.new("UICorner")
+    indicatorCorner.CornerRadius = UDim.new(0.2, 0)
+    indicatorCorner.Parent = indicator
+
+    -- **Button Click Function**
+    button.MouseButton1Click:Connect(function()
+        if teamName and teamName ~= "" then
+            indicator.BackgroundTransparency = 0  
+
+            local args = { [1] = teamName }
+            game:GetService("ReplicatedStorage").TeamSelect:FireServer(unpack(args))
+
+            wait(1)
+            indicator.BackgroundTransparency = 1  
+        end
+    end)
+
+    return button
+end
+
+-- **Create Team Selection Buttons**
+createButton(0.1, "   Facility Director Team", "facility director")
+createButton(0.24, "   Raider Team", "raider")
+createButton(0.38, "   Scientist Team", "scientist")
+createButton(0.52, "   Inspector Team", "inspector")
+createButton(0.66, "   Border Guard Team", "border guard")
+
+-- **Credits Label**
+local credits = Instance.new("TextLabel")
+credits.Size = UDim2.new(1, 0, 0.08, 0)
+credits.Position = UDim2.new(0, 0, 0.91, 0)
+credits.BackgroundTransparency = 1
+credits.TextColor3 = Color3.fromRGB(255, 255, 255)
+credits.Text = "Script made by Xploitware/Nmalka01"
+credits.Font = Enum.Font.SourceSansBold
+credits.TextSize = 16
+credits.TextTransparency = 0.3
+credits.Parent = frame
